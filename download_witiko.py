@@ -1,6 +1,5 @@
-from transformers import AutoTokenizer, AutoModel
-model = AutoModel.from_pretrained("witiko/mathberta")
-tokenizer = AutoTokenizer.from_pretrained("witiko/mathberta")
+# Load model directly
+from transformers import AutoTokenizer, AutoModelForMaskedLM
 
-model.save_pretrained("mathberta")
-tokenizer.save_pretrained("mathberta")
+tokenizer = AutoTokenizer.from_pretrained("witiko/mathberta")
+model = AutoModelForMaskedLM.from_pretrained("witiko/mathberta")
