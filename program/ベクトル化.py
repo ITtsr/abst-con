@@ -1,34 +1,37 @@
-import requests
-import numpy as np
-from typing import List
+from transformers import AutoTokenizer, AutoModel
+import torch
 
-class MathBERTaVectorizerAPI:
-    def __init__(self, api_token: str, model_name: str = "witiko/mathberta"):
-        self.api_token = api_token
-        self.api_url = f"https://api-inference.huggingface.co/models/{model_name}"
-        self.headers = {"Authorization": f"Bearer {self.api_token}"}
+def latex_to_vector(text: str, model_path: str = "witiko/mathberta") -> torch.Tensor:
+    """
+    LaTeX形式の文章を768次元のベクトルに変換する。
 
-    def vectorize(self, latex_text: str) -> np.ndarray:
-        response = requests.post(self.api_url, headers=self.headers, json={"inputs": latex_text})
+    Parameters:
+    - text (str): LaTeXを含む文章
+    - model_path (str): ローカルに保存されたMathBERTaのパスまたはHuggingFaceのモデル名
 
-        if response.status_code != 200:
-            raise RuntimeError(f"API request failed: {response.status_code} - {response.text}")
+    Returns:
+    - torch.Tensor: 文全体の768次元ベクトル（[CLS]トークンの表現）
+    """
+    # トークナイザーとモデルの読み込み
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = AutoModel.from_pretrained(model_path)
+    model.eval()
 
-        features = response.json()
-        # トークンごとのベクトルの平均を文ベクトルとする
-        return np.mean(np.array(features), axis=0)
+    # 入力テキストのトークン化
+    inputs = tokenizer(text, return_tensors="pt")
+
+    # 勾配を計算しないモードでベクトル化
+    with torch.no_grad():
+        outputs = model(**inputs)
+        # [CLS] トークンのベクトルを抽出
+        cls_embedding = outputs.last_hidden_state[0, 0, :]
+
+    return cls_embedding
 
 # 使用例
 if __name__ == "__main__":
-    import os
-    HF_API_TOKEN = "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"  # 環境変数にトークンを設定しておく
+    sample_text = "This is an example sentence with a formula [MATH] a^2 + b^2 = c^2 [/MATH]."
+    vector = latex_to_vector(sample_text, model_path="./local_model/mathberta")  # ローカルパスに変更可
+    print("768次元ベクトル:\n", vector)
+    print("次元数:", vector.shape[0])
 
-    if HF_API_TOKEN is None:
-        raise ValueError("Hugging Face API トークンが設定されていません。環境変数 HF_API_TOKEN を指定してください。")
-
-    vectorizer = MathBERTaVectorizerAPI(api_token=HF_API_TOKEN)
-    latex_input = r"Let $f(x) = x^2 + 3x + 2$. Then $f'(x) = 2x + 3$."
-    vec = vectorizer.vectorize(latex_input)
-
-    print("ベクトルの次元:", vec.shape)
-    print("ベクトルの内容（一部）:", vec[:10])
