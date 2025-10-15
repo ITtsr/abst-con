@@ -31,7 +31,7 @@ def latex_to_vector(text: str, model_path: str = "witiko/mathberta") -> torch.Te
 # 使用例
 if __name__ == "__main__":
     sample_text = "This is an example sentence with a formula [MATH] a^2 + b^2 = c^2 [/MATH]."
-    vector = latex_to_vector(sample_text, model_path="./local_model/mathberta")  # ローカルパスに変更可
+    vector = latex_to_vector(sample_text, model_path="./models/mathberta")  # ローカルパスに変更可
     print("768次元ベクトル:\n", vector)
     print("次元数:", vector.shape[0])
 
