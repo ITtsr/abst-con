@@ -12,3 +12,28 @@ client = MilvusClient(
     token=TOKEN, # API key or a colon-separated cluster username and password
     db_name=DB_NAME
 )
+
+
+
+def insert_ID_vector(primarykey,vector):
+    client.insert(
+    collection_name=DB_NAME,
+    data={
+        'primary_key': primarykey,
+        'vector': vector
+    }
+)
+
+
+vector=[
+        0.6186516144460161,
+        0.5927442462488592,
+        0.848608119657156,
+        0.9287046808231654,
+        -0.42215796530168403
+    ]
+
+primarykey=4
+
+insert_ID_vector(primarykey,vector)
+
