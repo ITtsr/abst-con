@@ -2,7 +2,7 @@
 import openai
 import os
 
-os.environ["OPENAI_API_KEY"]=api_key="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"
+os.environ["OPENAI_API_KEY"]=api_key="ここにAPIキーなど"
 cilent=openai.OpenAI()
 
 
