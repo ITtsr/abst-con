@@ -2,7 +2,7 @@ import openai
 
 # 環境変数からAPIキーを取得
 # セキュリティ上、APIキーは直接記述せず、環境変数で管理してください。（実際のプログラム）
-openai.api_key = "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"
+openai.api_key = "ここにAPIキーなど"
 
 def summarize_with_chatgpt(text):
     """
@@ -118,4 +118,5 @@ def main():
         print("要約結果:", summary)
 
 if __name__ == "__main__":
+
     main()
